@@ -1,0 +1,131 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+const int NUM_CLASSROOMS = 18;
+
+struct Classroom {
+    std::string section;
+    bool occupied;
+    std::vector<std::string> history;
+};
+
+void initializeClassrooms(Classroom classrooms[]) {
+    for (int i = 0; i < NUM_CLASSROOMS; i++) {
+        classrooms[i].section = "";
+        classrooms[i].occupied = false;
+    }
+}
+
+void displayClassroomStatus(const Classroom classrooms[]) {
+    std::cout << "Classroom Status:" << std::endl;
+    for (int i = 0; i < NUM_CLASSROOMS; i++) {
+        std::string roomNumber;
+        if (i < 4) {
+            roomNumber = std::to_string(i + 101);
+        } else if (i < 6) {
+            roomNumber = std::to_string(i + 101);
+        } else if (i < 9) {
+            roomNumber = "SL" + std::to_string(i - 5);
+        } else if (i == 9) {
+            roomNumber = "ML";
+        } else if (i == 10) {
+            roomNumber = "CL";
+        } else if (i < 14) {
+            roomNumber = std::to_string(i - 10 + 300);
+        } else if (i < 18) {
+            roomNumber = std::to_string(i - 13 + 400);
+        } else {
+            roomNumber = "Unknown";
+        }
+
+        std::cout << "|======ROOM======|" << std::endl;
+        std::cout << "|      Room      |" << roomNumber << ": ";
+        if (classrooms[i].occupied) {
+            std::cout << "Occupied by block section " << classrooms[i].section;
+        } else {
+            std::cout << "Unoccupied";
+        }
+        std::cout << std::endl;
+
+        // Display history log
+        if (!classrooms[i].history.empty()) {
+            std::cout << "|    History     |";
+            for (const std::string& section : classrooms[i].history) {
+                std::cout << section << " -> ";
+            }
+            std::cout << std::endl;
+        }
+
+        std::cout << "|================|" << std::endl;
+        std::cout << std::endl;
+    }
+}
+
+void setOccupied(Classroom classrooms[], const std::string& section, int room) {
+    if (room >= 101 && room <= 104) {
+        int index = room - 101;
+        if (classrooms[index].occupied) {
+            char choice;
+            std::cout << "Room " << room << " is currently occupied. What do you want to do?" << std::endl;
+            std::cout << "1. Unoccupy the room" << std::endl;
+            std::cout << "2. Keep it occupied" << std::endl;
+            std::cout << "Enter your choice: ";
+            std::cin >> choice;
+            if (choice == '1') {
+                classrooms[index].history.push_back(classrooms[index].section);
+                classrooms[index].section = "";
+                classrooms[index].occupied = false;
+                std::cout << "Room " << room << " is now unoccupied." << std::endl;
+            } else {
+                std::cout << "Room " << room << " remains occupied by section " << classrooms[index].section << std::endl;
+            }
+        } else {
+            char choice;
+            std::cout << "Room " << room << " is currently unoccupied. Do you want to occupy it? (y/n): ";
+            std::cin >> choice;
+            if (choice == 'y' || choice == 'Y') {
+                classrooms[index].history.push_back(classrooms[index].section);
+                classrooms[index].section = section;
+                classrooms[index].occupied = true;
+                std::cout << "Room " << room << " is now occupied by section " << section << std::endl;
+            } else {
+                std::cout << "Room " << room << " remains unoccupied." << std::endl;
+            }
+        }
+    } else {
+        std::cout << "Invalid room number." << std::endl;
+    }
+}
+
+int main() {
+    Classroom classrooms[NUM_CLASSROOMS];
+    initializeClassrooms(classrooms);
+
+    std::cout << "     |========================|" << std::endl;
+    std::cout << "     |CLASSROOM MODIFICATION  |" << std::endl;
+    std::cout << "     |========================|" << std::endl;
+
+    displayClassroomStatus(classrooms);
+
+    std::string section;
+    int room;
+    char choice;
+
+    do {
+        std::cout << "Enter the block section: ";
+        std::cin >> section;
+
+        std::cout << "Enter the room number : ";
+        std::cin >> room;
+
+        setOccupied(classrooms, section, room);
+
+        std::cout << "Do you want to modify another classroom? (y/n): ";
+        std::cin >> choice;
+    } while (choice == 'y' || choice == 'Y');
+
+    displayClassroomStatus(classrooms);
+
+    return 0;
+}
