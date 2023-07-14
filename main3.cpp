@@ -5,6 +5,8 @@
 #include <vector>
 #include <limits>
 #include <iomanip>
+#include <fstream>
+
 
 using namespace std;
 
@@ -32,6 +34,7 @@ private:
 
     vector<Room> rooms;
     vector<Reservation> reservations;
+    string reservationDataFile;
 
 public:
     ReservationSystem() {
@@ -52,6 +55,11 @@ public:
         rooms[12] = {false, 13, 40, "CEL"};
         rooms[13] = {false, 14, 40, "Room 401"};
         rooms[14] = {false, 15, 40, "Room 402"};
+        
+        reservationDataFile = "reservations.csv";
+
+        ofstream file(reservationDataFile, ios::app);
+        file.close();
     }
 
     void displayRoomList() {
@@ -175,11 +183,74 @@ public:
             reservations.push_back(reservation); // Store the reservation
 
             cout << "Room " << rooms[roomNumber - 1].roomName << " reserved." << endl;
+            
+            saveReservation(reservation);
+            
         } else {
             cout << "Invalid room number." << endl;
         }
     }
+	
+	void saveReservation(const Reservation& reservation) {
+        ofstream file("reservations.csv", ios::app);
+        if (file) {
+            file << reservation.roomNumber << ","
+                 << reservation.roomName << ","
+                 << reservation.day << "/"
+                 << reservation.month << "/"
+                 << reservation.year << ","
+                 << reservation.startTime << ","
+                 << reservation.endTime << ","
+                 << reservation.capacity << ","
+                 << reservation.section << ","
+                 << reservation.profName << "\n";
+            file.close();
+        } else {
+            cout << "Failed to open reservations database file." << endl;
+        }
+    }
 
+    void loadReservations() {
+        ifstream file("reservations.csv");
+        if (file) {
+            string line;
+            while (getline(file, line)) {
+                istringstream iss(line);
+                Reservation reservation;
+                string field;
+
+                getline(iss, field, ',');
+                reservation.roomNumber = stoi(field);
+
+                getline(iss, reservation.roomName, ',');
+
+                getline(iss, field, '/');
+                reservation.day = stoi(field);
+                getline(iss, field, '/');
+                reservation.month = stoi(field);
+                getline(iss, field, ',');
+                reservation.year = stoi(field);
+
+                getline(iss, field, ',');
+                reservation.startTime = stoi(field);
+                getline(iss, field, ',');
+                reservation.endTime = stoi(field);
+
+                getline(iss, field, ',');
+                reservation.capacity = stoi(field);
+
+                getline(iss, reservation.section, ',');
+
+                getline(iss, reservation.profName, '\n');
+
+                reservations.push_back(reservation);
+            }
+            file.close();
+        } else {
+            cout << "Failed to open reservations database file." << endl;
+        }
+    }
+    
     void checkReservations() {
         cout << "+---------------------------+" << endl;
         cout << "¦   CHECKING RESERVATIONS   ¦" << endl;
@@ -235,6 +306,8 @@ public:
     }
 
     void run() {
+    	
+    	loadReservations();
         int choice = 0;
         while (choice != 4) {
             time_t currentTime = time(0);
