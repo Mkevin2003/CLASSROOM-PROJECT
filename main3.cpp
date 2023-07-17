@@ -7,6 +7,7 @@
 #include <stack> // ---- TO USE STACK FUNCTIONS SUCH AS POP 
 #include <windows.h> // ----- AESTHETIC 
 
+
 HANDLE color = GetStdHandle(STD_OUTPUT_HANDLE); // ------ AESTHETIC ---- ADDING COLORS 
 using namespace std;
 
@@ -197,18 +198,18 @@ public:
     
     void displayRoomList() { //------------------------------------------------------------------------------------- DISPLAY THE ROOM INDEX, NAME AND CAP
     	SetConsoleTextAttribute(color, 11);
-        cout << "=======================================" << endl;
-        cout << "|            CICS BUILDING            |" << endl;
-        cout << "=======================================" << endl;
+        cout << "==============================================================" << endl;
+        cout << "|                       CICS BUILDING                        |" << endl;
+        cout << "==============================================================" << endl;
         SetConsoleTextAttribute(color, 14);
-        cout << "+----+-------+-----+----+-------+-----+" << endl;
-        cout << "| ID |  Room | CAP | ID |  Room | CAP |" << endl;
-        cout << "+----+-------+-----+----+-------+-----+" << endl;
+        cout << "\t   +----+-------+-----+----+-------+-----+" << endl;
+        cout << "\t   | ID |  Room | CAP | ID |  Room | CAP |" << endl;
+        cout << "\t   +----+-------+-----+----+-------+-----+" << endl;
 
         Room* temp = rooms;
         while (temp != nullptr)
 		{
-            cout << "|  " << setw(2) << temp->roomNumber << "|" << setw(5) << temp->roomName << "  | " << setw(3) << temp->capacity << " | ";
+            cout << "\t   " << "|  " << setw(2) << temp->roomNumber << "|" << setw(5) << temp->roomName << "  | " << setw(3) << temp->capacity << " | ";
             temp = temp->next;
             
             if (temp != nullptr) 
@@ -219,7 +220,9 @@ public:
             
             cout << endl;
         }
-        cout << "+----+-------+-----+----+-------+-----+" << endl;
+        SetConsoleTextAttribute(color, 11);
+        cout << "==============================================================" << endl;
+        SetConsoleTextAttribute(color, 14);
     }
     
     bool isValidDate(int day, int month, int year) // ------------------------------------------------------------------ ERROR HANDLING FOR DATE 
@@ -367,10 +370,15 @@ public:
 	    return numPeople;
 	}
 	
-    void reserveRoom() { // ----------------------------------------------------------------------------------------------- OCCUPYING THE ROOM --- HEART ----
-		    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
-		    cout << "|           OCCUPYING A ROOM          |" << endl;
-		    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
+    void reserveRoom() { // ------------------------------------------------------------------------------------------------------------- OCCUPYING THE ROOM --- HEART ----
+    		cout << "  ____   _____ _____ _    _ _______     _______ _   _  _____ " << endl;
+    		cout << " / __ \\ / ____/ ____| |  | |  __ \\ \\   / /_   _| \\ | |/ ____|" << endl;
+    		cout << "| |  | | |   | |    | |  | | |__) \\ \\_/ /  | | |  \\| | |  __ " << endl;
+    		cout << "| |  | | |   | |    | |  | |  ___/ \\   /   | | | . ` | | |_ |" << endl;
+    		cout << "| |__| | |___| |____| |__| | |      | |   _| |_| |\\  | |__| |" << endl;
+    		cout << " \\____/ \\_____\\_____|\\____/|_|      |_|  |_____|_| \\_|\\_____|" << endl;
+		    cout << "==============================================================" << endl;
+
 		
 		    displayRoomList();
 		    
@@ -473,77 +481,7 @@ public:
 
 		}
 
-    void deleteReservation() // ----------------------------------------------------------------------------------------------- DELETE A SPECIFIC RESERVATION --------------
-		{
-		    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
-		    cout << "|          DELETING A RESERVATION         |" << endl;
-		    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
-		
-		    int referenceNumber;
-		    cout << "Enter the reference number you want to delete: ";
-		    cin >> referenceNumber;
-		
-		    Reservation* prev = nullptr;
-		    Reservation* current = reservations;
-		    bool reservationDeleted = false; // Flag variable to track if reservation was found and deleted
-		
-		    while (current != nullptr)
-		    {
-		        if (current->referenceNumber == referenceNumber)
-		        {
-		            cout << endl;
-		            cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
-		            cout << "| Reservation Found: " << endl;
-		            cout << "| Reference Number: " << current->referenceNumber << endl;
-		            cout << "| Teacher: " << current->profName << endl;
-		            cout << "| Room: " << current->roomName << endl;
-		            cout << "| Section: " << current->section << endl;
-		            cout << "| Start time: " << asctime(localtime(&current->startTime));
-		            cout << "| End time: " << asctime(localtime(&current->endTime));
-		            cout << "| Occupancy date: " << current->day << "/" << current->month << "/" << current->year << endl;
-		            cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
-		            cout << endl;
-		
-		            char confirmation;
-		            cout << "Are you sure you want to delete this reservation? (y/n): ";
-		            cin >> confirmation;
-		            if (tolower(confirmation) == 'y')
-		            {
-		                if (prev == nullptr)
-		                {
-		                    reservations = current->next;
-		                }
-		                else
-		                {
-		                    prev->next = current->next;
-		                }
-		                delete current;
-		                cout << endl;
-		                cout << "Reservation with reference number " << referenceNumber << " deleted." << endl;
-		                updateReservationFile();
-		                reservationDeleted = true; 
-		            }
-		            else
-		            {
-		                cout << "Deletion canceled." << endl;
-		            }
-		        }
-		        prev = current;
-		        current = current->next;
-		    }
-		
-		    if (!reservationDeleted)
-		    {
-		        cout << endl;
-		        cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+" << endl;
-		        cout << "No reservation found with the given reference number." << endl;
-		        cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+" << endl;
-		    }
-		
-		    cout << "Enter to go back to Menu --->";
-		    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-		    cin.get();
-		}
+    
 
     void saveReservation(const Reservation& reservation)  // -------------------------------------------------------------- SAVE RESERVATION ON CSV DATABASE ---------
 	{
@@ -566,7 +504,7 @@ public:
         }
     }
 
-	void sortsHistory()  // --------------------------------------------------------------------------------------------------------- MENU SORT HISTORY -----
+	void sortsHistory()  // ------------------------------------------------------------------------------------------------------------- MENU SORT HISTORY -------------------
 	{
 		cin.ignore();
 	    while (true)
@@ -593,16 +531,16 @@ public:
 	        switch (choice)
 	        {
 	            case 1:
-	                system("CLS");
+	                historyArt();
 	                checkReservations();
 	                break;
 	            case 2:
-	                system("CLS");
+	                historyArt();
 	                sortReservationsByClosestTime();
 	                break;
 	            case 3:
-	                system("CLS");
 	                {
+	                	historyArt();
 	                    cout << "+-=-=-=-=-=-=-=-=-=-=--=-=+" << endl;
 	                    cout << "| Show Active Reservation |" << endl;
 	                    cout << "+-=-=-=-=-=-=-=-=-=-=--=-=+" << endl;
@@ -631,9 +569,7 @@ public:
 
 	void checkReservations() // -------------------------------------------------------------------------------------------- CHECK RESERVATIONS (REFERENCE NUMBER)  ---------
 	{
-	    system("CLS");
-	    cout << "+---------------------------+" << endl;
-	    cout << "|      CHECKING HISTORY     |" << endl;
+	    
 	    displayInfo();
 	    if (reservations == nullptr) {
 	        cout << endl;
@@ -648,9 +584,11 @@ public:
 	    cout << "+---------------------------------------------------------------------------------------------+" << endl;
 	    cout << endl;
 	}
-
+	
 	void searchRoomAvailability() // -------------------------------------------------------------------------------------------------- SEARCH ROOM AVAILABILITY ---------
 	{
+		system("CLS");
+		searchArt();
 	    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
 	    cout << "|       SEARCH ROOM AVAILABILITY      |" << endl;
 	    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
@@ -685,6 +623,7 @@ public:
 	    }
 	    
 		system ("CLS");
+		searchArt();
 		cout << "+----------------------------------------------------+" << endl;
 	    cout << "|   SEARCH AVAILABLE ROOMS FROM: " << formatTime(reservation.startTime) << " TO " << formatTime(reservation.endTime)<< endl;
 	    cout << "+----------------------------------------------------+" << endl;
@@ -846,6 +785,7 @@ public:
 	void showActiveReservationsForRoom(const string& roomName) // ------------------------------------------------------------------------ SHOW ACTIVE RESERVATION FOR ROOM -----------
 	{
 		system("CLS");
+		historyArt();
 	    cout << "+---------------------------------------+" << endl;
 	    cout << "|  ACTIVE RESERVATIONS FOR ROOM: " << roomName << endl;
 	
@@ -868,9 +808,12 @@ public:
 	}
 
     void checkRoomStatus() { //---------------------------------------------------------------------------------------------------- CHECK ROOM STATUS ---best part-------------
-	    cout << "+--------------------------+" << endl;
-	    cout << "|   CHECKING ROOM STATUS   |" << endl;
-	    cout << "+--------------------------+" << endl;
+	    cout << "  _____   ____   ____  __  __    _____ _______    _______ _    _  _____ " << endl;
+	    cout << " |  __ \\ / __ \\ / __ \\|  \\/  |  / ____|__   __|/\\|__   __| |  | |/ ____|" << endl;
+	    cout << " | |__) | |  | | |  | | \\  / | | (___    | |  /  \\  | |  | |  | | (___  " << endl;
+	    cout << " |  _  /| |  | | |  | | |\\/| |  \\___ \\   | | / /\\ \\ | |  | |  | |\\___ \\ " << endl;
+	    cout << " | | \\ \\| |__| | |__| | |  | |  ____) |  | |/ ____ \\| |  | |__| |____) |" << endl;
+	    cout << " |_|  \\_\\\\____/ \\____/|_|  |_| |_____/   |_/_/    \\_\\_|   \\____/|_____/ " << endl;
 	
 	    time_t currentTime = time(0);
 	    tm* currentTime_tm = localtime(&currentTime);
@@ -934,9 +877,85 @@ public:
         cout << "Press Enter to go back to Menu --->";
         cin.get();
     }
- 
+ 	void deleteReservation() // ----------------------------------------------------------------------------------------------- DELETE A SPECIFIC RESERVATION --------------
+		{
+			deleteArt();
+		    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
+		    cout << "|          DELETING A RESERVATION         |" << endl;
+		    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
+		
+		    int referenceNumber;
+		    cout << "Enter the reference number you want to delete: ";
+		    cin >> referenceNumber;
+		
+		    Reservation* prev = nullptr;
+		    Reservation* current = reservations;
+		    bool reservationDeleted = true; // Flag variable to track if reservation was found and deleted
+		
+		    while (current != nullptr)
+		    {
+		        if (current->referenceNumber == referenceNumber)
+		        {
+		            cout << endl;
+		            cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
+		            cout << "| Reservation Found: " << endl;
+		            cout << "| Reference Number: " << current->referenceNumber << endl;
+		            cout << "| Teacher: " << current->profName << endl;
+		            cout << "| Room: " << current->roomName << endl;
+		            cout << "| Section: " << current->section << endl;
+		            cout << "| Start time: " << asctime(localtime(&current->startTime));
+		            cout << "| End time: " << asctime(localtime(&current->endTime));
+		            cout << "| Occupancy date: " << current->day << "/" << current->month << "/" << current->year << endl;
+		            cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
+		            cout << endl;
+		
+		            char confirmation;
+		            cout << "Are you sure you want to delete this reservation? (y/n): ";
+		            cin >> confirmation;
+		            if (tolower(confirmation) == 'y')
+		            {
+		                if (prev == nullptr)
+		                {
+		                    reservations = current->next;
+		                }
+		                else
+		                {
+		                    prev->next = current->next;
+		                }
+		                delete current;
+		                cout << endl;
+		                cout << "Reservation with reference number " << referenceNumber << " deleted." << endl;
+		                updateReservationFile();
+		                reservationDeleted = false; 
+		            }
+		            else
+		            {
+		            	cout << endl;
+		            	SetConsoleTextAttribute(color, 14);
+		                cout << "Deletion canceled." << endl << endl;
+		                SetConsoleTextAttribute(color, 12);
+		            }
+		        }
+		        prev = current;
+		        current = current->next;
+		    }
+		
+		    if (!reservationDeleted)
+		    {
+		        cout << endl;
+		        cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+" << endl;
+		        cout << "No reservation found with the given reference number." << endl;
+		        cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+" << endl;
+		    }
+		
+		    cout << "Enter to go back to Menu --->";
+		    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		    cin.get();
+		}
+		
 	void deleteLastReservation() //------------------------------------------------------------------------------------------------------ DELETE LAST RESERVATION -------------
 		{
+			 deleteArt();
 		    if (reservations == nullptr)
 		    {
 		        cout << "No reservations found." << endl;
@@ -1037,19 +1056,89 @@ public:
 		        enterToGoBack();
 		    }
 		}
+		
+	void searchArt()
+	{
+		cout << "  _____ ______          _____   _____ _    _    _____   ____   ____  __  __ " << endl;
+ 		cout << " / ____|  ____|   /\\   |  __ \\ / ____| |  | |  |  __ \\ / __ \\ / __ \\|  \\/  | " << endl;
+ 		cout << "| (___ | |__     /  \\  | |__) | |    | |__| |  | |__) | |  | | |  | | \\  / |" << endl;
+ 		cout << " \\___ \\|  __|   / /\\ \\ |  _  /| |    |  __  |  |  _  /| |  | | |  | | |\\/| |" << endl;
+ 		cout << " ____) | |____ / ____ \\| | \\ \\| |____| |  | |  | | \\ \\| |__| | |__| | |  | |" << endl;
+ 		cout << "|_____/|______/_/    \\_\\_|  \\_\\\\_____|_|  |_|  |_|  \\_\\\\____/ \\____/|_|  |_| " << endl;
+	}
+	void historyArt()
+	{
+			system("CLS");
+			cout << " _    _ _____  _____ _______ ____  _______     __ " << endl;
+    		cout << "| |  | |_   _|/ ____|__   __/ __ \\|  __ \\ \\   / /" << endl;
+    		cout << "| |__| | | | | (___    | | | |  | | |__) \\ \\_/ /  " << endl;
+    		cout << "|  __  | | |  \\___ \\   | | | |  | |  _  / \\   /  " << endl;
+    		cout << "| |  | |_| |_ ____) |  | | | |__| | | \\ \\  | |   " << endl;
+    		cout << "|_|  |_|_____|_____/   |_|  \\____/|_|  \\_\\ |_|" << endl;
+	}
+	void deleteArt()
+	{
+		system("CLS");
+			SetConsoleTextAttribute(color, 12);
+			cout << " _____  ______ _      ______ _______ ______ " << endl;
+    		cout << "|  __ \\|  ____| |    |  ____|__   __|  ____" << endl;
+    		cout << "| |  | | |__  | |    | |__     | |  | |__   " << endl;
+    		cout << "| |  | |  __| | |    |  __|    | |  |  __|   " << endl;
+    		cout << "| |__| | |____| |____| |____   | |  | |____ " << endl;
+    		cout << "|_____/|______|______|______|  |_|  |______|" << endl;
+	}
 };
 
+welcome(){
+		SetConsoleTextAttribute(color, 11);
+		cout << "  _____ _                _____ _____ _____   ____   ____  __  __ " << endl;
+ 		cout << " / ____| |        /\\    / ____/ ____|  __ \\ / __ \\ / __ \\|  \\/  |" << endl;
+ 		cout << "| |    | |       /  \\  | (___| (___ | |__) | |  | | |  | | \\  / |" << endl;
+ 		cout << "| |    | |      / /\\ \\  \\___ \\\\___ \\|  _  /| |  | | |  | | |\\/| |" << endl;
+ 		cout << "| |____| |____ / ____ \\ ____) |___) | | \\ \\| |__| | |__| | |  | |" << endl;
+ 		cout << " \\_____|______/_/    \\_\\_____/_____/|_|  \\_\\\\____/ \\____/|_|  |_| " << endl;
+ 		
+ 		cout << endl;
+ 		
+ 		cout << " _____  ______  _____ ______ _______      __  _______ _____ ____  _   _  " << endl;
+ 		cout << "|  __ \\|  ____|/ ____|  ____|  __ \\ \\    / /\\|__   __|_   _/ __ \\| \\ | |" << endl;
+ 		cout << "| |__) | |__  | (___ | |__  | |__) \\ \\  / /  \\  | |    | || |  | |  \\| |" << endl;
+ 		cout << "|  _  /|  __|  \\___ \\|  __| |  _  / \\ \\/ / /\\ \\ | |    | || |  | | . ` |" << endl;
+ 		cout << "| | \\ \\| |____ ____) | |____| | \\ \\  \\  / ____ \\| |   _| || |__| | |\\  |" << endl;
+ 		cout << "|_|  \\_\\______|_____/|______|_|  \\_\\  \\/_/    \\_\\_|  |_____\\____/|_| \\_|" << endl;
+ 		
+ 		cout << endl;
+ 		cout << "  _______     _______ _______ ______ __  __  " << endl;
+ 		cout << " / ____\\ \\   / / ____|__   __|  ____|  \\/  |" << endl;
+ 		cout << "| (___  \\ \\_/ / (___    | |  | |__  | \\  / |" << endl;
+ 		cout << " \\___ \\  \\   / \\___ \\   | |  |  __| | |\\/| |" << endl;
+ 		cout << " ____) |  | |  ____) |  | |  | |____| |  | |" << endl;
+ 		cout << "|_____/   |_| |_____/   |_|  |______|_|  |_|" << endl;
+	}
 int main() {
+	ReservationSystem reservationSystem;
+	welcome();
+        cout << endl;
+        reservationSystem.enterToGoBack();
     while (true) {
-    	ReservationSystem reservationSystem;
+    	
    		int choice;
         system("CLS");
-        time_t currentTime = time(0);
+        system("CLS");
+        time_t currentTime = time(0);	
         tm* currentTime_tm = localtime(&currentTime);
         SetConsoleTextAttribute(color, 14);
         cout << "Time: " << asctime(currentTime_tm);
+        SetConsoleTextAttribute(color, 14);
+		cout << "  __  __ ______ _    _ _    _   " << endl;
+ 		cout << " |  \\/  |  ____|  \\ | | |  | | " << endl;
+ 		cout << " | \\  / | |__  |   \\| | |  | |" << endl;
+ 		cout << " | |\\/| |  __| | .    | |  | |" << endl;
+ 		cout << " | |  | | |____| | \\  | |__| |" << endl;
+ 		cout << " |_|  |_|______|_|  \\_|\\____/ " << endl;
+                            
         cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
-        cout << "|           MENU             |" << endl;
+        cout << "|                            |" << endl;
         cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
         cout << "| [1] Occupy a Room          |" << endl;
         cout << "| [2] Check Room Status      |" << endl;
@@ -1081,6 +1170,7 @@ int main() {
                 break;
             case 3:
             	system("CLS");
+            	reservationSystem.historyArt();
                 reservationSystem.sortsHistory();
                 break;
             case 4:
