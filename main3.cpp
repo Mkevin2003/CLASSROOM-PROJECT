@@ -579,11 +579,11 @@ public:
 	        cout << "       2. Sort by Closest Time to Current Time |   " << endl;
 	        cout << "       3. Show Active Reservations for a Room  |    " << endl;
 	        cout << "+---------------------------------------------------------------------------------------------+" << endl;
-	        cout << "Enter your choice (1-5): ";
+	        cout << "Enter your choice (1-4): ";
 	        int choice;
 	        if (!(cin >> choice))
 	        {
-	            cout << "Invalid input! Please enter a valid choice (1-5)." << endl;
+	            cout << "Invalid input! Please enter a valid choice (1-4)." << endl;
 	            cin.clear();  // Clear error state flags
 	            cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	            continue; // Continue to the next iteration of the loop
