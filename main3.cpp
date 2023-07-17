@@ -1,24 +1,26 @@
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <limits>
-#include <iomanip>
-#include <fstream>
+#include <iostream> // ---- DEFAULT
+#include <sstream> // ----- MANIPULATE STRINGS 
+#include <string> // ----- FOR STRINGS
+#include <limits> // ----- FOR ERROR HANDLING. 
+#include <iomanip> // ----- AESTHETIC
+#include <fstream> // ----- DATA BASE RELATED 
+#include <stack> // ---- TO USE STACK FUNCTIONS SUCH AS POP 
+#include <windows.h> // ----- AESTHETIC 
 
+HANDLE color = GetStdHandle(STD_OUTPUT_HANDLE); // ------ AESTHETIC ---- ADDING COLORS 
 using namespace std;
 
 class ReservationSystem {
 private:
-	
+	// ----------------------------------------------------------------------------------------------------------------------- DECLARING VARIABLES-------------
     struct Room {
-        bool occupied;
         int roomNumber;
         int capacity;
         string roomName;
         Room* next;
         
         Room(int roomNumber, int capacity, const string& roomName)
-            : occupied(false), roomNumber(roomNumber), capacity(capacity), roomName(roomName), next(nullptr) {}
+            :  roomNumber(roomNumber), capacity(capacity), roomName(roomName), next(nullptr) {}
     };
 
     struct Reservation {
@@ -49,7 +51,7 @@ private:
 
 public:
 	
-    ReservationSystem() 
+    ReservationSystem() //------------------------------------------------------------------------------------------------ INITIALIZER
 	{
 	    nextReferenceNumber = 1;
 	    rooms = nullptr;
@@ -61,12 +63,13 @@ public:
 	    loadReservationsFromFile();
     }
 
-    void createRooms() {
+    void createRooms() { // ------------------------------------------------------------------------------------------- CREATES A LINKED LIST WITH DEFAULT ARRAYS FOR ROOMS ---
         string roomNames[] = {
             "101", "102", "103", "104", "201",
             "202", "203", "SL1", "SL2", "SL3", "ML", "Cisco",
             "CEL", "401", "402"
         };
+        
         int capacity[] = {40,40,40,40,40,40,30,30,40,50,40,40,40,30,40};
         int numRooms = sizeof(roomNames) / sizeof(roomNames[0]);
 
@@ -79,7 +82,7 @@ public:
         }
     }
 
-    void addReservationNode(const Reservation& reservation)
+    void addReservationNode(const Reservation& reservation) // --------------------------------------------------------- LINKING RESERVATION TO THE LINKED LIST ---- TAIL ---
 	{
         Reservation* newNode = new Reservation(reservation);
         newNode->next = nullptr;
@@ -95,7 +98,7 @@ public:
         }
     }
 
-    void updateReservationFile() 
+    void updateReservationFile() // -------------------------------------------------------------------------------------- UPDATING CSV DATABASE ----
 	{
         ofstream file(reservationDataFile);
         if (file) {
@@ -120,7 +123,7 @@ public:
         }
     }
     
-	void loadReservationsFromFile() {
+	void loadReservationsFromFile() { // -------------------------------------------------------------------------------- LOADING THE CSV DATABASE -- TRAVERSES THEN GETS THE TOP REFERENCE #----
         ifstream file(reservationDataFile);
         if (file) {
             string line;
@@ -150,9 +153,7 @@ public:
 
                 addReservationNode(reservation);
             }
-            file.close();
 
-            // Find the highest reference number and set nextReferenceNumber
             int highestReferenceNumber = 0;
             Reservation* temp = reservations;
             while (temp != nullptr) {
@@ -167,7 +168,7 @@ public:
         }
     }
 
-    time_t getTimestamp(int day, int month, int year, int hour, int minute) 
+    time_t getTimestamp(int day, int month, int year, int hour, int minute) // ------------------------------------------------- TIME RELATED FUNCTION -- CONVERTS INPUT TO LEGIT TIME I THINK --
 	{
         struct tm timeStruct;
         timeStruct.tm_sec = 0;
@@ -177,58 +178,29 @@ public:
         timeStruct.tm_mon = month - 1;
         timeStruct.tm_year = year - 1900;
         timeStruct.tm_isdst = -1;
-        
         return mktime(&timeStruct);
     }
-
-    int getRoomCapacity(int roomNumber) {
-        Room* temp = rooms;
-        while (temp != nullptr) {
-            if (roomNumber == temp->roomNumber) {
-                return temp->capacity;
-            }
-            temp = temp->next;
-        }
-        return 0; // Room not found
-    }
-
-    string getRoomName(int roomNumber) {
-        Room* temp = rooms;
-        while (temp != nullptr) {
-            if (roomNumber == temp->roomNumber) {
-                return temp->roomName;
-            }
-            temp = temp->next;
-        }
-        return "N/A"; // Room not found
-    }
     
-    bool isValidDate(int day, int month, int year) 
-	{
-        if (year < 1900 || year > 9999)
-            return false;
-
-        if (month < 1 || month > 12)
-            return false;
-
-        int maxDay = 31; 
-
-        if (month == 4 || month == 6 || month == 9 || month == 11)
-            maxDay = 30;
-        else if (month == 2) {
-            if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)
-                maxDay = 29;
-            else
-                maxDay = 28;
-        }
-
-        return (day >= 1 && day <= maxDay);
-    }
-	
-    void displayRoomList() {
+    void displayInfo()  // --------------------------------------------------------------------------------------------------- DISPLAY COLUMNS (AESTHETIC)
+    {
+    	
+    	cout << "+---------------------------------------------------------------------------------------------+" << endl;
+    	cout << setw(9) << left << "| Ref Num";
+        cout << setw(16) << left << "| Teacher";
+        cout << setw(13) << left << "| Room";
+        cout << setw(12) << left << "| Section";
+        cout << setw(14) << left << "| Start time";
+        cout << setw(14) << left << "| End time";
+        cout << setw(14) << left << "| Occupancy date" << "|" << endl;
+        cout << "+---------------------------------------------------------------------------------------------+" << endl;
+	}
+    
+    void displayRoomList() { //------------------------------------------------------------------------------------- DISPLAY THE ROOM INDEX, NAME AND CAP
+    	SetConsoleTextAttribute(color, 11);
         cout << "=======================================" << endl;
         cout << "|            CICS BUILDING            |" << endl;
         cout << "=======================================" << endl;
+        SetConsoleTextAttribute(color, 14);
         cout << "+----+-------+-----+----+-------+-----+" << endl;
         cout << "| ID |  Room | CAP | ID |  Room | CAP |" << endl;
         cout << "+----+-------+-----+----+-------+-----+" << endl;
@@ -244,19 +216,166 @@ public:
                 cout << " " << setw(2) << temp->roomNumber << "| " << setw(5) << temp->roomName << " | " << setw(3) << temp->capacity << " | ";
                 temp = temp->next;
             }
+            
             cout << endl;
         }
-
         cout << "+----+-------+-----+----+-------+-----+" << endl;
     }
+    
+    bool isValidDate(int day, int month, int year) // ------------------------------------------------------------------ ERROR HANDLING FOR DATE 
+	{
+        if (year < 2023|| year > 9999)
+            return false;
 
-    void reserveRoom() {
+        if (month < 1 || month > 12)
+            return false;
+
+        int maxDay = 31; 
+
+        if (month == 4 || month == 6 || month == 9 || month == 11)
+            maxDay = 30;
+        else if (month == 2) {
+            if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)
+                maxDay = 29;
+            else
+                maxDay = 28;
+        }
+        return (day >= 1 && day <= maxDay);
+    }
+    
+	string getValidDateString(int& day, int& month, int& year) { // ------------------------------------------------------- SEPERATING INPUT DATE ---- 
+		    bool validDate = false;
+		    string dateString;
+		    while (!validDate) {
+		        cout << "Enter the date of occupancy (DD MM YYYY): ";
+		        getline(cin, dateString);
+		        istringstream dateStream(dateString);
+		        dateStream >> day >> month >> year;
+		        validDate = isValidDate(day, month, year);
+		        if (!validDate) {
+		        	SetConsoleTextAttribute(color, 12);
+		            cout << "Invalid date.";
+		            SetConsoleTextAttribute(color, 11);
+		        }
+		    }
+		    return dateString;
+	}
+	
+	void getTimeInput(const string& prompt, int& hour, int& minute) // ------------------------------------------------- SEPERATING STRING AND ERROR HANDLING FOR INPUTTING TIME --------
+	{
+	    bool validTime = false;
+	    while (!validTime) {
+	        cout << prompt;
+	        string timeString;
+	        getline(cin, timeString);
+	
+	        istringstream timeStream(timeString);
+	        if (timeStream >> hour) {
+		        if (hour >= 0 && hour <= 23) {
+		            if (timeStream >> minute) {
+
+		                if (minute >= 0 && minute <= 59) {
+		                    validTime = true;
+		                } else {
+		                	SetConsoleTextAttribute(color, 12);
+		                    cout << "Invalid minute. Please enter a valid minute (0-59): ";
+		                    SetConsoleTextAttribute(color, 11);
+		                }
+		            } else {
+		                minute = 0;  // Set the minute to 00 by default
+		                validTime = true;
+		            }
+		        } else {
+		        	SetConsoleTextAttribute(color, 12);
+		            cout << "Invalid hour. Please enter a valid hour (0-23): ";
+		            SetConsoleTextAttribute(color, 11);
+		        }
+		    } else {
+		    	SetConsoleTextAttribute(color, 12);
+		        cout << "Invalid time format. Input (HOUR MINUTE) | ";
+		        SetConsoleTextAttribute(color, 11);
+    		}
+	    }
+	}
+	
+	int getValidRoomNumber() { // ---------------------------------------------------------------------------------------- ERROR HANDLING FOR ROOM INDEX -----
+	    int roomNumber;
+	    cout << "Enter the room ID you wish to occupy/reserve (1-15): ";
+	    while (!(cin >> roomNumber) || roomNumber < 1 || roomNumber > 15) {
+	        cin.clear();
+	        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	        SetConsoleTextAttribute(color, 12);
+	        cout << "Please enter a valid room ID (1-15): ";
+	        SetConsoleTextAttribute(color, 11);
+	    }
+	    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	    return roomNumber;
+	}
+	
+	
+	int getRoomCapacity(int roomNumber) {  // --------------------------------------------------------------------- GET ROOMCAPACITY USING ROOM NUMBER ----
+        Room* temp = rooms;
+        while (temp != nullptr) {
+            if (roomNumber == temp->roomNumber) {
+                return temp->capacity;
+            }
+            temp = temp->next;
+        }
+        return 0;
+    }
+
+    string getRoomName(int roomNumber) {  // ---------------------------------------------------------------------- GET ROOMNAME USING ROOM NUMBER ----------
+        Room* temp = rooms;
+        while (temp != nullptr) {
+            if (roomNumber == temp->roomNumber) {
+                return temp->roomName;
+            }
+            temp = temp->next;
+        }
+        return "N/A"; 
+    }
+    
+    bool checkReservationOverlap(const Reservation& reservation) {  // ------------------------------------------------ CHECKING FOR OVERLAP RESERVATIONS ---------
+	    Reservation* temp = reservations;
+	    while (temp != nullptr) {
+	        if (reservation.roomNumber == temp->roomNumber &&
+	            reservation.startTime < temp->endTime &&
+	            reservation.endTime > temp->startTime) {
+	            cout << endl;
+	            SetConsoleTextAttribute(color, 12);
+	            cout << "Overlapping reservation reference number: " << temp->referenceNumber << endl;
+	            SetConsoleTextAttribute(color, 11);
+	            return true;
+	        }
+	        temp = temp->next;
+	    }
+	    return false;
+	}
+
+	int getValidNumberOfStudents(int roomCapacity) { // -------------------------------------------------------------- ERROR HANDLING FOR CAPACITY -----
+	    int numPeople;
+	    cout << "Enter Number of Students: ";
+	    while (!(cin >> numPeople) || numPeople > roomCapacity) {
+	        cin.clear();
+	        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	        SetConsoleTextAttribute(color, 12);
+	        cout << "Check the CAP." ;
+	        SetConsoleTextAttribute(color, 11);
+			cout << "Please enter a valid number: ";
+	    }
+	    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	    return numPeople;
+	}
+	
+    void reserveRoom() { // ----------------------------------------------------------------------------------------------- OCCUPYING THE ROOM --- HEART ----
 		    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
 		    cout << "|           OCCUPYING A ROOM          |" << endl;
 		    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
 		
 		    displayRoomList();
-		
+		    
+		    cout << endl;
+			SetConsoleTextAttribute(color, 11);
 		    int roomNumber = getValidRoomNumber();
 			
 			int day, month, year;
@@ -281,7 +400,9 @@ public:
 		
 		        if (endHour < startHour || (endHour == startHour && endMinute <= startMinute)) {
 		            validEndTime = false;
+		            SetConsoleTextAttribute(color, 12);
 		            cout << "Invalid end time. The end time must be later than the start time." << endl;
+		            SetConsoleTextAttribute(color, 11);
 		            cout << "Please enter a valid end time: ";
 		        } else {
 		            validEndTime = true;
@@ -293,148 +414,66 @@ public:
 		
 		    bool overlap = checkReservationOverlap(reservation);
 		    if (overlap) {
+		    	SetConsoleTextAttribute(color, 12);
 		        cout << "The room is already reserved during the specified time. Request rejected." << endl;
+		        cout << endl;
+		        SetConsoleTextAttribute(color, 14);
 		        enterToGoBack();
 		        return;
 		    }
-		
-		    reservation.section = getReservationSection();
+			SetConsoleTextAttribute(color, 11);
+		    string teacherName;
+		    cout << "Enter Professor's Name: ";
+		    getline(cin, teacherName);
+		    reservation.profName = teacherName;
+			string section;
+			
+		    cout << "Enter Section: ";
+		    getline(cin, section);
+		    reservation.section = section;
+		    
 		    reservation.capacity = getValidNumberOfStudents(reservation.capacity);
-		
-		    reservation.profName = getTeacherName();
-		
+
 		    cout << endl;
+		    SetConsoleTextAttribute(color, 10);
 		    cout << "======================================" << endl;
 		    cout << "|  Room: " << reservation.roomName << endl;
+		    cout << "|  Professor: " << reservation.profName << endl;
 		    cout << "|  Section: " << reservation.section << endl;
 		    cout << "|  Start time: " << asctime(localtime(&reservation.startTime));
 		    cout << "|  End time: " << asctime(localtime(&reservation.endTime));
 		    cout << "|  Occupancy date: " << reservation.day << "/" << reservation.month << "/" << reservation.year << endl;
 		    cout << "======================================" << endl;
-		
+			cout << endl;
 		    char confirmation;
+		    SetConsoleTextAttribute(color, 14);
 		    cout << "Are you sure you want to reserve this room? (y/n): ";
 		    cin >> confirmation;
 		    if (confirmation != 'y' && confirmation != 'Y') {
+		    	SetConsoleTextAttribute(color, 12);
 		        cout << "Reservation cancelled." << endl;
+		        SetConsoleTextAttribute(color, 14);
 		        enterToGoBack();
 		        return;
 		    }
+		    
 		    reservation.referenceNumber = nextReferenceNumber;
 		    nextReferenceNumber++;
 		
 		    addReservationNode(reservation); // Store the reservation
 		
-		    cout << endl << endl;
-		
-		    cout << "Room " << getRoomName(roomNumber) << " reserved. Reference number: " << reservation.referenceNumber << endl;
-		
+		    cout << endl;
+			SetConsoleTextAttribute(color, 10);
+		    cout << "Room " << getRoomName(roomNumber) << " reserved. Reference number: " << reservation.referenceNumber;
+			SetConsoleTextAttribute(color, 14);
 		    saveReservation(reservation);
-		
+		    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		    cout << endl;
 		    enterToGoBack();
+
 		}
 
-	
-	void getTimeInput(const string& prompt, int& hour, int& minute) {
-	    bool validTime = false;
-	    while (!validTime) {
-	        cout << prompt;
-	        string timeString;
-	        getline(cin, timeString);
-	
-	        istringstream timeStream(timeString);
-	        if (timeStream >> hour) {
-		        if (hour >= 0 && hour <= 23) {
-		            if (timeStream >> minute) {
-
-		                if (minute >= 0 && minute <= 59) {
-		                    validTime = true;
-		                } else {
-		                    cout << "Invalid minute. Please enter a valid minute (0-59): ";
-		                }
-		            } else {
-		                minute = 0;  // Set the minute to 00 by default
-		                validTime = true;
-		            }
-		        } else {
-		            cout << "Invalid hour. Please enter a valid hour (0-23): ";
-		        }
-		    } else {
-		        cout << "Invalid time format. Please enter the start time in HH MM format (e.g., 10 00): ";
-    }
-	    }
-	}
-	int getValidRoomNumber() {
-	    int roomNumber;
-	    cout << "Enter the room ID you wish to occupy/reserve (1-15): ";
-	    while (!(cin >> roomNumber) || roomNumber < 1 || roomNumber > 15) {
-	        cin.clear();
-	        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-	        cout << "Please enter a valid room ID (1-15): ";
-	    }
-	    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-	    return roomNumber;
-	}
-
-	string getValidDateString(int& day, int& month, int& year) {
-		    bool validDate = false;
-		    string dateString;
-		    while (!validDate) {
-		        cout << "Enter the date of occupancy (DD MM YYYY): ";
-		        getline(cin, dateString);
-		        istringstream dateStream(dateString);
-		        dateStream >> day >> month >> year;
-		        validDate = isValidDate(day, month, year);
-		        if (!validDate) {
-		            cout << "Invalid date format or invalid date. ";
-		        }
-		    }
-		    return dateString;
-		}
-
-	bool checkReservationOverlap(const Reservation& reservation) {
-	    Reservation* temp = reservations;
-	    while (temp != nullptr) {
-	        if (reservation.roomNumber == temp->roomNumber &&
-	            reservation.startTime < temp->endTime &&
-	            reservation.endTime > temp->startTime) {
-	            cout << "Overlapping reservation reference number: " << temp->referenceNumber << endl;
-	            return true;
-	        }
-	        temp = temp->next;
-	    }
-	    return false;
-	}
-
-	
-	string getReservationSection() {
-	    string section;
-	    cout << "Enter Section: ";
-	    getline(cin, section);
-	    return section;
-	}
-	
-	int getValidNumberOfStudents(int roomCapacity) {
-	    int numPeople;
-	    cout << "Enter Number of Students: ";
-	    while (!(cin >> numPeople) || numPeople > roomCapacity) {
-	        cin.clear();
-	        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-	        cout << "Invalid number of students. Please enter a valid number: ";
-	    }
-	    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-	    return numPeople;
-	}
-	
-	string getTeacherName() {
-	    string teacherName;
-	    cout << "Enter Teacher's Name: ";
-	    getline(cin, teacherName);
-	    return teacherName;
-	}
-
-
-    void deleteReservation()
+    void deleteReservation() // ----------------------------------------------------------------------------------------------- DELETE A SPECIFIC RESERVATION --------------
 		{
 		    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
 		    cout << "|          DELETING A RESERVATION         |" << endl;
@@ -479,9 +518,10 @@ public:
 		                    prev->next = current->next;
 		                }
 		                delete current;
+		                cout << endl;
 		                cout << "Reservation with reference number " << referenceNumber << " deleted." << endl;
 		                updateReservationFile();
-		                reservationDeleted = true; // Set flag to true
+		                reservationDeleted = true; 
 		            }
 		            else
 		            {
@@ -505,9 +545,7 @@ public:
 		    cin.get();
 		}
 
-
-
-    void saveReservation(const Reservation& reservation) 
+    void saveReservation(const Reservation& reservation)  // -------------------------------------------------------------- SAVE RESERVATION ON CSV DATABASE ---------
 	{
         ofstream file("reservations.csv", ios::app);
         if (file) {
@@ -528,147 +566,94 @@ public:
         }
     }
 
-   
-	void sortsHistory()
+	void sortsHistory()  // --------------------------------------------------------------------------------------------------------- MENU SORT HISTORY -----
 	{
+		cin.ignore();
 	    while (true)
 	    {
+	    	SetConsoleTextAttribute(color, 14);
 	        cout << "+---------------------------------------------------------------------------------------------+" << endl;
 	        cout << "|                                        FILTER HISTORY                                       |" << endl;
 	        cout << "+---------------------------------------------------------------------------------------------+" << endl;
-	        cout << "       1. Default (by reference #)             |      4. Search Availability " << endl;
-	        cout << "       2. Sort by Closest Time to Current Time |      5. Go Back to Main Menu" << endl;
+	        cout << "       1. Default (by reference #)             |      4. Go Back to Main Menu " << endl;
+	        cout << "       2. Sort by Closest Time to Current Time |   " << endl;
 	        cout << "       3. Show Active Reservations for a Room  |    " << endl;
 	        cout << "+---------------------------------------------------------------------------------------------+" << endl;
-	        cout << "Enter your choice (1-5): ";	
+	        cout << "Enter your choice (1-5): ";
 	        int choice;
-	        cin >> choice;
+	        if (!(cin >> choice))
+	        {
+	            cout << "Invalid input! Please enter a valid choice (1-5)." << endl;
+	            cin.clear();  // Clear error state flags
+	            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	            continue; // Continue to the next iteration of the loop
+	        }
+	        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	
-	        switch (choice) {
+	        switch (choice)
+	        {
 	            case 1:
 	                system("CLS");
 	                checkReservations();
 	                break;
 	            case 2:
-	            	system("CLS");
+	                system("CLS");
 	                sortReservationsByClosestTime();
 	                break;
 	            case 3:
 	                system("CLS");
-	            {
-	            	cout << "+-=-=-=-=-=-=-=-=-=-=--=-=+" << endl;
-	            	cout << "| Show Active Reservation |" << endl;
-	            	cout << "+-=-=-=-=-=-=-=-=-=-=--=-=+" << endl;
-	                string roomName;
-	                cout << "Enter the room name: ";
-	                cin.ignore();
-	                getline(cin, roomName);
-	                showActiveReservationsForRoom(roomName);
+	                {
+	                    cout << "+-=-=-=-=-=-=-=-=-=-=--=-=+" << endl;
+	                    cout << "| Show Active Reservation |" << endl;
+	                    cout << "+-=-=-=-=-=-=-=-=-=-=--=-=+" << endl;
+	                    string roomName;
+	                    cout << "Enter the room name: ";
+	                    cin.clear();  // Clear error state flags
+	                    getline(cin, roomName);
+	                    showActiveReservationsForRoom(roomName);
+	                }
 	                break;
-	            }
 	            case 4:
-	                system("CLS");
-	      			searchRoomAvailability();
-	                break;
-	            case 5:
-	           		return; 
+	               return;
 	            default:
 	                cout << "Invalid choice!" << endl;
-	            	enterToGoBack();
-	                return;
-	        }
-	
-	        cout << "Do you want to Filter History? (Y/N): ";
-	        char option;
-	        cin >> option;
-	        if (option != 'Y' && option != 'y')
-	        {
-	            break; 
+	                break;
 	        }
 	    }
 	}
 
-
-
-	string formatTime(time_t time) 
+	string formatTime(time_t time) // -------------------------------------------------------------------------------------------------- FORMAT TIME (AESTHETIC) -----
 	{
 	    char buffer[9]; 
 	    strftime(buffer, sizeof(buffer), "%H:%M:%S", localtime(&time));
 	    return buffer;
 	}	
 
-	int partition(Reservation** arr, int low, int high) {
-	    Reservation* pivot = arr[high];
-	    int i = low - 1;
-	
-	    for (int j = low; j < high; j++) {
-	        if (arr[j]->referenceNumber <= pivot->referenceNumber) {
-	            i++;
-	            swap(arr[i], arr[j]);
-	        }
-	    }
-	
-	    swap(arr[i + 1], arr[high]);
-	    return i + 1;
-	}
-
-	void quickSort(Reservation** arr, int low, int high) {
-	    if (low < high) {
-	        int pivotIndex = partition(arr, low, high);
-	
-	        quickSort(arr, low, pivotIndex - 1);
-	        quickSort(arr, pivotIndex + 1, high);
-	    }
-	}
-
-	void checkReservations() {
-		system("CLS");
+	void checkReservations() // -------------------------------------------------------------------------------------------- CHECK RESERVATIONS (REFERENCE NUMBER)  ---------
+	{
+	    system("CLS");
 	    cout << "+---------------------------+" << endl;
 	    cout << "|      CHECKING HISTORY     |" << endl;
-		displayInfo();
+	    displayInfo();
 	    if (reservations == nullptr) {
 	        cout << endl;
 	        cout << " |  No reservations found  |" << endl;
 	    } else {
-	        int count = 0;
 	        Reservation* temp = reservations;
 	        while (temp != nullptr) {
-	            count++;
+	            displayReservation(temp);
 	            temp = temp->next;
 	        }
-	        Reservation** reservationArray = new Reservation*[count];
-	        temp = reservations;
-	        int i = 0;
-	        while (temp != nullptr) {
-	            reservationArray[i] = temp;
-	            temp = temp->next;
-	            i++;
-	        }
-	
-	        // Sort the reservations using quicksort
-	        quickSort(reservationArray, 0, count - 1);
-	
-	        // Display the sorted reservations
-	        for (int i = 0; i < count; i++) {
-	            displayReservation(reservationArray[i]);
-	        }
-	
-	        // Clean up memory
-	        delete[] reservationArray;
-	    }
-	
+    }
 	    cout << "+---------------------------------------------------------------------------------------------+" << endl;
 	    cout << endl;
-	    sortsHistory();
 	}
 
-
-
-	void searchRoomAvailability() {
+	void searchRoomAvailability() // -------------------------------------------------------------------------------------------------- SEARCH ROOM AVAILABILITY ---------
+	{
 	    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
-	    cout << "|        SEARCH ROOM AVAILABILITY      |" << endl;
+	    cout << "|       SEARCH ROOM AVAILABILITY      |" << endl;
 	    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
-		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	    int day, month, year;
 	    
 	    string dateString = getValidDateString(day, month, year);
@@ -677,13 +662,15 @@ public:
 	    reservation.day = day;
 	    reservation.month = month;
 	    reservation.year = year;
-	
+	    
 	    int startHour, startMinute;
+	    
 	    getTimeInput("Enter the start time (HH MM): ", startHour, startMinute);
 	    reservation.startTime = getTimestamp(day, month, year, startHour, startMinute);
 	
 	    int endHour, endMinute;
 	    bool validEndTime = false;
+	    
 	    while (!validEndTime) {
 	        getTimeInput("Enter the end time (HH MM): ", endHour, endMinute);
 	        reservation.endTime = getTimestamp(day, month, year, endHour, endMinute);
@@ -696,23 +683,23 @@ public:
 	            validEndTime = true;
 	        }
 	    }
-	
-	    cout << "Searching for available rooms from " << formatTime(reservation.startTime);
-	    cout << " to " << formatTime(reservation.endTime) << endl;
-	    cout << endl;
-	
+	    
+		system ("CLS");
+		cout << "+----------------------------------------------------+" << endl;
+	    cout << "|   SEARCH AVAILABLE ROOMS FROM: " << formatTime(reservation.startTime) << " TO " << formatTime(reservation.endTime)<< endl;
+	    cout << "+----------------------------------------------------+" << endl;
 	    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+" << endl;
 	    cout << "   Room       |     Status        |     Reference #" << endl;
 	    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+" << endl;
 	
-	    for (int roomNumber = 1; roomNumber <= 15; roomNumber++) {
+	    for (int roomNumber = 1; roomNumber <= 15; roomNumber++) 
+		{
 	        reservation.roomNumber = roomNumber;
-	
 	        Reservation* temp = reservations;
 	        bool occupied = false;
-	
 	        while (temp != nullptr) {
 	            if (temp->roomNumber == roomNumber && temp->startTime < reservation.endTime && temp->endTime > reservation.startTime) {
+	            	SetConsoleTextAttribute(color, 12);
 	                cout << " Room  " << left << setw(10) << getRoomName(roomNumber) << setw(14) << "   Occupied               " << temp->referenceNumber << endl;
 	                occupied = true;
 	                break;
@@ -721,15 +708,18 @@ public:
 	        }
 	
 	        if (!occupied) {
+	        	SetConsoleTextAttribute(color, 10);
 	            cout <<" Room  " << left << setw(10) << getRoomName(roomNumber) << setw(14) <<  "   Available             "  << endl;
 	        }
 	    }
-	
+	    SetConsoleTextAttribute(color, 14);
 	    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+" << endl;
+	    SetConsoleTextAttribute(color, 14);
+	    
+	    enterToGoBack();
 	}
 
-
-	void displayReservation(const Reservation* temp) 
+	void displayReservation(const Reservation* temp) //--------------------------------------------------------------------------------- DISPLAYING INFO TEMP ----------------------
 	{
 	    cout << "| ";
 	    cout << setw(7) << left << temp->referenceNumber;
@@ -744,105 +734,118 @@ public:
 	    cout << "| ";
 	    cout << setw(12) << left << formatTime(temp->endTime);
 	    cout << "| ";
-	    cout << temp->day << "/" << temp->month << "/" << temp->year;
-	    cout << "     |" << endl;
+	    cout << temp->day << "/" << temp->month << "/" << setw(12) << left << temp->year ;
+	    cout << endl;
+
 	}
 	
-	void sortReservationsByClosestTime() 
-{
-    if (reservations == nullptr) {
-        cout << "No reservations found." << endl;
-        return;
-    }
-
-    // Count the number of reservations
-    int count = 0;
-    Reservation* temp = reservations;
-    while (temp != nullptr) {
-        count++;
-        temp = temp->next;
-    }
-
-    // Perform bubble sort
-    bool sorted = false;
-    for (int i = 0; i < count - 1 && !sorted; i++) {
-        sorted = true;
-        temp = reservations;
-        Reservation* prev = nullptr;
-        Reservation* nextNode = temp->next;
-        for (int j = 0; j < count - 1 - i; j++) {
-            if (temp->startTime > nextNode->startTime) {
-                sorted = false;
-                // Swap the reservations
-                if (prev == nullptr) {
-                    reservations = nextNode;
-                } else {
-                    prev->next = nextNode;
-                }
-                temp->next = nextNode->next;
-                nextNode->next = temp;
-                // Update the previous node and next node references
-                prev = nextNode;
-                nextNode = temp->next;
-            } else {
-                prev = temp;
-                temp = nextNode;
-                nextNode = nextNode->next;
-            }
-        }
-    }
-    cout << "+--------------------------+" << endl;
-    cout << "|    ACTIVE RESERVATIONS   |" << endl;
-    cout << "+--------------------------+" << endl;
-    bool found = false;
-	    temp = reservations;
-		displayInfo();
+	void sortReservationsByClosestTime() // -------------------------------------------------------------------------------------- SORT BY CLOSEST TIME (BUBBLE SORT) --------
+		{
+		    if (reservations == nullptr) 
+			{
+		        cout << "No reservations found." << endl;
+		        return;
+	    	}
+	    Reservation* tempReservations = nullptr;
+	    Reservation* temp = reservations;
+	    Reservation* prev = nullptr;
+	
 	    while (temp != nullptr) {
-	        if (temp->endTime > time(0)) {
-	            found = true;
-	            displayReservation(temp);
+	        Reservation* newReservation = new Reservation(*temp);
+	
+	        if (prev == nullptr) {
+	            tempReservations = newReservation;
+	        } else {
+	            prev->next = newReservation;
 	        }
 	
+	        prev = newReservation;
 	        temp = temp->next;
 	    }
 	
-	    if (!found) {
+	    bool sorted = false;
+	    while (!sorted) {
+	        sorted = true;
+	        temp = tempReservations;
+	        prev = nullptr;
+	
+	        while (temp != nullptr && temp->next != nullptr) {
+	            if (temp->startTime > temp->next->startTime) {
+	                sorted = false;
+	                Reservation* nextNode = temp->next;
+	                Reservation* nextNextNode = nextNode->next;
+	
+	                if (prev == nullptr) {
+	                    tempReservations = nextNode;
+	                } else {
+	                    prev->next = nextNode;
+	                }
+	
+	                nextNode->next = temp;
+	                temp->next = nextNextNode;
+	                prev = nextNode;
+	            } else {
+	                prev = temp;
+	                temp = temp->next;
+	            }
+	        }
+	    }
+	    
+		SetConsoleTextAttribute(color, 10);
+	    cout << "+--------------------------+" << endl;
+	    cout << "|    ACTIVE RESERVATIONS   |" << endl;
+	    cout << "+--------------------------+" << endl;
+	    bool foundActive = false;
+	    temp = tempReservations;
+	    displayInfo();
+	
+	    while (temp != nullptr) {
+	        if (temp->endTime > time(0)) {
+	            foundActive = true;
+	            displayReservation(temp);
+	        }
+	        temp = temp->next;
+	    }
+	
+	    if (!foundActive) {
 	        cout << "   No active reservations found" << endl;
 	    }
-	    cout << "+---------------------------------------------------------------------------------------------+" << endl;
-    cout << "+---------------------------+" << endl;
-    cout << "|    EXPIRED RESERVATIONS   |" << endl;
-    cout << "+---------------------------+" << endl;
-    displayInfo();
-    bool foundExpired = false;
-    temp = reservations;
-    while (temp != nullptr) {
-        if (temp->endTime <= time(0)) {
-            foundExpired = true;
-            displayReservation(temp);
-        }
-        temp = temp->next;
-    }
 	
-    if (!foundExpired) {
-        cout << "No expired reservations found" << endl;
-    }
-    cout << "+---------------------------------------------------------------------------------------------+" << endl;
-}
-    void displayInfo()
-    {
-    	cout << "+---------------------------------------------------------------------------------------------+" << endl;
-    	cout << setw(9) << left << "| Ref Num";
-        cout << setw(16) << left << "| Teacher";
-        cout << setw(13) << left << "| Room";
-        cout << setw(12) << left << "| Section";
-        cout << setw(14) << left << "| Start time";
-        cout << setw(14) << left << "| End time";
-        cout << setw(14) << left << "| Occupancy date" << "|" << endl;
-        cout << "+---------------------------------------------------------------------------------------------+" << endl;
+	    cout << "+---------------------------------------------------------------------------------------------+" << endl;
+	    SetConsoleTextAttribute(color, 12);
+	    cout << "+---------------------------+" << endl;
+	    cout << "|    EXPIRED RESERVATIONS   |" << endl;
+	    cout << "+---------------------------+" << endl;
+	    bool foundExpired = false;
+	    temp = tempReservations;
+	    displayInfo();
+	
+	    while (temp != nullptr) {
+	        if (temp->endTime <= time(0)) {
+	            foundExpired = true;
+	            displayReservation(temp);
+	        }
+	        temp = temp->next;
+	    }
+	
+	    if (!foundExpired) {
+	        cout << "No expired reservations found" << endl;
+	    }
+	
+	    cout << "+---------------------------------------------------------------------------------------------+" << endl;
+	
+	    // Clean up the temporary linked list
+	    temp = tempReservations;
+	    while (temp != nullptr) {
+	        Reservation* nextNode = temp->next;
+	        delete temp;
+	        temp = nextNode;
+	    }
 	}
-	void showActiveReservationsForRoom(const string& roomName) 
+	
+	void showActiveReservationsForRoom(const string& roomName) // ------------------------------------------------------------------------ SHOW ACTIVE RESERVATION FOR ROOM -----------
 	{
+		system("CLS");
 	    cout << "+---------------------------------------+" << endl;
 	    cout << "|  ACTIVE RESERVATIONS FOR ROOM: " << roomName << endl;
 	
@@ -864,14 +867,13 @@ public:
 	    cout << endl;
 	}
 
-    void checkRoomStatus() {
+    void checkRoomStatus() { //---------------------------------------------------------------------------------------------------- CHECK ROOM STATUS ---best part-------------
 	    cout << "+--------------------------+" << endl;
 	    cout << "|   CHECKING ROOM STATUS   |" << endl;
 	    cout << "+--------------------------+" << endl;
 	
 	    time_t currentTime = time(0);
 	    tm* currentTime_tm = localtime(&currentTime);
-	
 	    cout << "+============================================================================================================+" << endl;
 	    cout << "|    ROOM     |    STATUS   |    PROFESSOR    |   SECTION   |   END TIME    |   # OF RESERVATION(S) TODAY    |" << endl;
 	    cout << "+============================================================================================================+" << endl;
@@ -891,6 +893,7 @@ public:
 	            }
 	            tempReservation = tempReservation->next;
 	        }
+	        
 	        int reservationCount = 0;
 	        tempReservation = reservations;
 	        while (tempReservation != nullptr) {
@@ -902,9 +905,15 @@ public:
 	            }
 	            tempReservation = tempReservation->next;
 	        }
+	        
 	        if (roomOccupied)
 			{
-	            cout << "| " << "Room " << left << setw(7) << temp->roomName << "|     OCCUPIED| " << right << setw(16) << currentReservation->profName << "| " << right << setw(12)
+	            cout << "| " << "Room " << left << setw(7) << temp->roomName << "| ";
+	            SetConsoleTextAttribute(color, 12);
+				cout << "    OCCUPIED";
+				SetConsoleTextAttribute(color, 14);
+				cout << "|  "<< right << setw(15);
+				cout << currentReservation->profName << "|" << right << setw(13)
 	                << currentReservation->section << "|   " << formatTime(currentReservation->endTime)<< "    |      " << reservationCount << endl;
 	        } 
 			else {
@@ -915,24 +924,129 @@ public:
 	    }
 	    cout << "+============================================================================================================+" << endl;
 	    cout << endl;
+	    cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	    enterToGoBack();
 	}
 
-    void enterToGoBack() {
+    void enterToGoBack() {  //------------------------------------------------------------------------------------------------------------- ENTER TO GO BACK -------------------
+    	cin.clear();
         cout << "Press Enter to go back to Menu --->";
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cin.get();
     }
+ 
+	void deleteLastReservation() //------------------------------------------------------------------------------------------------------ DELETE LAST RESERVATION -------------
+		{
+		    if (reservations == nullptr)
+		    {
+		        cout << "No reservations found." << endl;
+		        return;
+		    }
+		
+		    stack<Reservation*> reservationStack;
+		    Reservation* current = reservations;
+		
+		    while (current != nullptr)
+		    {
+		        reservationStack.push(current);
+		        current = current->next;
+		    }
+		
+		    if (reservationStack.empty())
+		    {
+		        cout << "No reservations found." << endl;
+		        return;
+		    }
+		
+		    Reservation* lastReservation = reservationStack.top();
+		    reservationStack.pop();
+		
+		    while (!reservationStack.empty())
+		    {
+		        current = reservationStack.top();
+		        reservationStack.pop();
+		    }
+		
+		    cout << endl;
+		    SetConsoleTextAttribute(color, 12);
+		    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
+		    cout << "| MOST RECENT RESERVATION: " << endl;
+		    cout << "| Reference Number: " << lastReservation->referenceNumber << endl;
+		    cout << "| Teacher: " << lastReservation->profName << endl;
+		    cout << "| Room: " << lastReservation->roomName << endl;
+		    cout << "| Section: " << lastReservation->section << endl;
+		    cout << "| Start time: " << asctime(localtime(&lastReservation->startTime));
+		    cout << "| End time: " << asctime(localtime(&lastReservation->endTime));
+		    cout << "| Occupancy date: " << lastReservation->day << "/" << lastReservation->month << "/" << lastReservation->year << endl;
+		    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
+		    cout << endl;
+		    SetConsoleTextAttribute(color, 14);
+		
+		    char confirmation;
+		    bool validConfirmation = false;
+		    while (!validConfirmation)
+		    {
+		        cout << "Are you sure you want to delete this reservation? (y/n): ";
+		        cin >> confirmation;
+		        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		
+		        if (tolower(confirmation) == 'y' || tolower(confirmation) == 'n')
+		        {
+		            validConfirmation = true;
+		        }
+		        else
+		        {
+		        	SetConsoleTextAttribute(color, 12);
+		            cout << "Invalid choice! Please enter 'y' for yes or 'n' for no." << endl;
+		            SetConsoleTextAttribute(color, 14);
+		        }
+		    }
+		
+		    if (tolower(confirmation) == 'y')
+		    {
+		        delete lastReservation;
+		        SetConsoleTextAttribute(color, 12);
+		        cout << endl << "Last reservation deleted." << endl << endl;
+		        SetConsoleTextAttribute(color, 14);
+		        enterToGoBack();
+		
+		        Reservation* prev = nullptr;
+		        current = reservations;
+		
+		        if (current == lastReservation)
+		        {
+		            reservations = current->next;
+		        }
+		        else
+		        {
+		            while (current != lastReservation)
+		            {
+		                prev = current;
+		                current = current->next;
+		            }
+		            prev->next = current->next;
+		        }
+		
+		        updateReservationFile(); // Update the reservation file
+		    }
+		    else
+		    {	SetConsoleTextAttribute(color, 10);
+		    	cout << endl;
+		        cout << "Deletion canceled." << endl << endl;
+		        SetConsoleTextAttribute(color, 14);
+		        enterToGoBack();
+		    }
+		}
 };
-
 
 int main() {
     while (true) {
     	ReservationSystem reservationSystem;
-   		 int choice;
+   		int choice;
         system("CLS");
         time_t currentTime = time(0);
         tm* currentTime_tm = localtime(&currentTime);
+        SetConsoleTextAttribute(color, 14);
         cout << "Time: " << asctime(currentTime_tm);
         cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
         cout << "|           MENU             |" << endl;
@@ -941,37 +1055,55 @@ int main() {
         cout << "| [2] Check Room Status      |" << endl;
         cout << "| [3] Check History          |" << endl;
         cout << "| [4] Delete a Reservation   |" << endl;
-        cout << "| [5] Clear Screen           |" << endl;
-        cout << "| [6] Exit                   |" << endl;
+        cout << "| [5] Delete Most Recent     |" << endl;
+        cout << "| [6] Search Availability    |" << endl;
+        cout << "| [7] Exit                   |" << endl;
         cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
         cout << "Choice: ";
-        while (!(cin >> choice) || choice < 1 || choice > 7) {
+        
+        while (!(cin >> choice) || choice < 1 || choice > 7) 
+		{
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid choice. Please enter a valid choice (1-5): ";
+            SetConsoleTextAttribute(color, 12);
+            cout << "Please enter a valid choice (1-6): ";
+            SetConsoleTextAttribute(color, 14);
         }
+        
         switch (choice) {
             case 1:
+            	system("CLS");
                 reservationSystem.reserveRoom();
                 break;
             case 2:
+            	system("CLS");
                 reservationSystem.checkRoomStatus();
                 break;
             case 3:
-                reservationSystem.checkReservations();
+            	system("CLS");
+                reservationSystem.sortsHistory();
                 break;
             case 4:
+            	system("CLS");
                 reservationSystem.deleteReservation();
                 break;
             case 5: 
             	system("CLS");
+            	cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+" << endl;
+				cout << "|  DELETE MOST RECENT RESERVATION |" << endl;
+				cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+" << endl;
+				reservationSystem.deleteLastReservation();
             	break;
-            case 6:
+            case 7:
                 cout << endl;
-					cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
-					cout << "|          Good Bye          |" << endl;
-					cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
-                return 0;
+				cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
+				cout << "|          Good Bye          |" << endl;
+				cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
+                return 0; 	
+            case 6:
+            	cin.clear();
+          		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            	reservationSystem.searchRoomAvailability();
     	}
 	}
 }
