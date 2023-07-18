@@ -1019,109 +1019,75 @@ public:
 		    cin.get();
 		}
 		
-	void deleteLastReservation() //------------------------------------------------------------------------------------------------------ DELETE LAST RESERVATION -------------
-		{
-			deleteArt();
-		    if (reservations == nullptr)
-		    {
-		        cout << "No reservations found." << endl;
-		        return;
-		    }
-		
-		    stack<Reservation*> reservationStack;
-		    Reservation* current = reservations;
-		
-		    while (current != nullptr)
-		    {
-		        reservationStack.push(current);
-		        current = current->next;
-		    }
-		
-		    if (reservationStack.empty())
-		    {
-		        cout << "No reservations found." << endl;
-		        return;
-		    }
-		
-		    Reservation* lastReservation = reservationStack.top();
-		    reservationStack.pop();
-		
-		    while (!reservationStack.empty())
-		    {
-		        current = reservationStack.top();
-		        reservationStack.pop();
-		    }
-		
-		    cout << endl;
-		    SetConsoleTextAttribute(color, 12);
-		    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
-		    cout << "| MOST RECENT RESERVATION: " << endl;
-		    cout << "| Reference Number: " << lastReservation->referenceNumber << endl;
-		    cout << "| Teacher: " << lastReservation->profName << endl;
-		    cout << "| Room: " << lastReservation->roomName << endl;
-		    cout << "| Section: " << lastReservation->section << endl;
-		    cout << "| Start time: " << asctime(localtime(&lastReservation->startTime));
-		    cout << "| End time: " << asctime(localtime(&lastReservation->endTime));
-		    cout << "| Occupancy date: " << lastReservation->day << "/" << lastReservation->month << "/" << lastReservation->year << endl;
-		    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
-		    cout << endl;
-		    SetConsoleTextAttribute(color, 14);
-		
-		    char confirmation;
-		    bool validConfirmation = false;
-		    while (!validConfirmation)
-		    {
-		        cout << "Are you sure you want to delete this reservation? (y/n): ";
-		        cin >> confirmation;
-		        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-		
-		        if (tolower(confirmation) == 'y' || tolower(confirmation) == 'n')
-		        {
-		            validConfirmation = true;
-		        }
-		        else
-		        {
-		        	SetConsoleTextAttribute(color, 12);
-		            cout << "Invalid choice! Please enter 'y' for yes or 'n' for no." << endl;
-		            SetConsoleTextAttribute(color, 14);
-		        }
-		    }
-		
-		    if (tolower(confirmation) == 'y')
-		    {
-		        delete lastReservation;
-		        SetConsoleTextAttribute(color, 12);
-		        cout << endl << "Last reservation deleted." << endl << endl;
-		        SetConsoleTextAttribute(color, 14);
-		        enterToGoBack();
-		
-		        Reservation* prev = nullptr;
-		        current = reservations;
-		
-		        if (current == lastReservation)
-		        {
-		            reservations = current->next;
-		        }
-		        else
-		        {
-		            while (current != lastReservation)
-		            {
-		                prev = current;
-		                current = current->next;
-		            }
-		            prev->next = current->next;
-		        }
-		
-		        updateReservationFile(); // Update the reservation file
-		    }
-		    else
-		    {	SetConsoleTextAttribute(color, 10);
-		    	cout << endl;
-		        cout << "Deletion canceled." << endl << endl;
-		        SetConsoleTextAttribute(color, 14);
-		        enterToGoBack();
-		    }
-		}
+	void deleteLastReservation() {
+    deleteArt();
+    if (reservations == nullptr) {
+        cout << "No reservations found." << endl;
+        return;
+    }
+
+    Reservation* current = reservations;
+    Reservation* prev = nullptr;
+
+    while (current->next != nullptr) {
+        prev = current;
+        current = current->next;
+    }
+
+    cout << endl;
+    SetConsoleTextAttribute(color, 12);
+    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
+    cout << "| MOST RECENT RESERVATION: " << endl;
+    cout << "| Reference Number: " << current->referenceNumber << endl;
+    cout << "| Teacher: " << current->profName << endl;
+    cout << "| Room: " << current->roomName << endl;
+    cout << "| Section: " << current->section << endl;
+    cout << "| Start time: " << asctime(localtime(&current->startTime));
+    cout << "| End time: " << asctime(localtime(&current->endTime));
+    cout << "| Occupancy date: " << current->day << "/" << current->month << "/" << current->year << endl;
+    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
+    cout << endl;
+    SetConsoleTextAttribute(color, 14);
+
+    char confirmation;
+    bool validConfirmation = false;
+    while (!validConfirmation) {
+        cout << "Are you sure you want to delete this reservation? (y/n): ";
+        cin >> confirmation;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        if (tolower(confirmation) == 'y' || tolower(confirmation) == 'n') {
+            validConfirmation = true;
+        } else {
+            SetConsoleTextAttribute(color, 12);
+            cout << "Invalid choice! Please enter 'y' for yes or 'n' for no." << endl;
+            SetConsoleTextAttribute(color, 14);
+        }
+    }
+
+    if (tolower(confirmation) == 'y') {
+        if (prev == nullptr) {
+            reservations = current->next;
+        } else {
+            prev->next = current->next;
+        }
+
+        delete current;
+        SetConsoleTextAttribute(color, 12);
+        cout << endl << "Last reservation deleted." << endl << endl;
+        SetConsoleTextAttribute(color, 14);
+        enterToGoBack();
+
+        updateReservationFile(); // Update the reservation file
+    } else {
+        SetConsoleTextAttribute(color, 10);
+        cout << endl;
+        cout << "Deletion canceled." << endl << endl;
+        SetConsoleTextAttribute(color, 14);
+        enterToGoBack();
+    }
+}
+
 		
 	void searchArt()
 	{
