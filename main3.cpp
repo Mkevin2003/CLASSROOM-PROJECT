@@ -638,7 +638,7 @@ public:
 	        bool occupied = false;
 	        while (temp != nullptr) {
 	            if (temp->roomNumber == roomNumber && temp->startTime < reservation.endTime && temp->endTime > reservation.startTime) {
-	            	SetConsoleTextAttribute(color, 12);
+	            	SetConsoleTextAttribute(color, 6);
 	                cout << " Room  " << left << setw(10) << getRoomName(roomNumber) << setw(14) << "   Occupied               " << temp->referenceNumber << endl;
 	                occupied = true;
 	                break;
@@ -647,7 +647,7 @@ public:
 	        }
 	
 	        if (!occupied) {
-	        	SetConsoleTextAttribute(color, 10);
+	        	SetConsoleTextAttribute(color, 14);
 	            cout <<" Room  " << left << setw(10) << getRoomName(roomNumber) << setw(14) <<  "   Available             "  << endl;
 	        }
 	    }
@@ -890,13 +890,14 @@ public:
 		
 		    Reservation* prev = nullptr;
 		    Reservation* current = reservations;
-		    bool reservationDeleted = true; // Flag variable to track if reservation was found and deleted
+		    bool reservationDeleted = false; // Flag variable to track if reservation was found and deleted
 		
 		    while (current != nullptr)
 		    {
 		        if (current->referenceNumber == referenceNumber)
 		        {
 		            cout << endl;
+		            SetConsoleTextAttribute(color, 12);
 		            cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
 		            cout << "| Reservation Found: " << endl;
 		            cout << "| Reference Number: " << current->referenceNumber << endl;
@@ -924,9 +925,10 @@ public:
 		                }
 		                delete current;
 		                cout << endl;
+		                SetConsoleTextAttribute(color, 10);
 		                cout << "Reservation with reference number " << referenceNumber << " deleted." << endl;
 		                updateReservationFile();
-		                reservationDeleted = false; 
+		                reservationDeleted = true; 
 		            }
 		            else
 		            {
@@ -934,6 +936,7 @@ public:
 		            	SetConsoleTextAttribute(color, 14);
 		                cout << "Deletion canceled." << endl << endl;
 		                SetConsoleTextAttribute(color, 12);
+		                reservationDeleted = true;
 		            }
 		        }
 		        prev = current;
@@ -1091,6 +1094,15 @@ public:
 
 welcome(){
 		SetConsoleTextAttribute(color, 11);
+		cout << "  _____ _____ _____  _____ " << endl;
+ 		cout << " / ____|_   _/ ____|/ ____|" << endl;
+ 		cout << "| |      | || |    | (___  " << endl;
+ 		cout << "| |      | || |     \\___ \\ " << endl;
+ 		cout << "| |____ _| || |____ ____) |" << endl;
+ 		cout << " \\_____|_____\\_____|_____/  " << endl;
+ 		
+ 		cout << endl;
+
 		cout << "  _____ _                _____ _____ _____   ____   ____  __  __ " << endl;
  		cout << " / ____| |        /\\    / ____/ ____|  __ \\ / __ \\ / __ \\|  \\/  |" << endl;
  		cout << "| |    | |       /  \\  | (___| (___ | |__) | |  | | |  | | \\  / |" << endl;
@@ -1099,7 +1111,7 @@ welcome(){
  		cout << " \\_____|______/_/    \\_\\_____/_____/|_|  \\_\\\\____/ \\____/|_|  |_| " << endl;
  		
  		cout << endl;
- 		
+
  		cout << " _____  ______  _____ ______ _______      __  _______ _____ ____  _   _  " << endl;
  		cout << "|  __ \\|  ____|/ ____|  ____|  __ \\ \\    / /\\|__   __|_   _/ __ \\| \\ | |" << endl;
  		cout << "| |__) | |__  | (___ | |__  | |__) \\ \\  / /  \\  | |    | || |  | |  \\| |" << endl;
@@ -1108,6 +1120,7 @@ welcome(){
  		cout << "|_|  \\_\\______|_____/|______|_|  \\_\\  \\/_/    \\_\\_|  |_____\\____/|_| \\_|" << endl;
  		
  		cout << endl;
+
  		cout << "  _______     _______ _______ ______ __  __  " << endl;
  		cout << " / ____\\ \\   / / ____|__   __|  ____|  \\/  |" << endl;
  		cout << "| (___  \\ \\_/ / (___    | |  | |__  | \\  / |" << endl;
@@ -1185,10 +1198,17 @@ int main() {
 				reservationSystem.deleteLastReservation();
             	break;
             case 7:
+            	system("CLS");
                 cout << endl;
-				cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
-				cout << "|          Good Bye          |" << endl;
-				cout << "+=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
+				cout << "\t\t   _____                 _ _                  _ " << endl;
+		 		cout << "\t\t  / ____|               | | |                | |" << endl;
+		 		cout << "\t\t | |  __  ___   ___   __| | |__  _   _  ___  | |" << endl;
+		 		cout << "\t\t | | |_ |/ _ \\ / _ \\ / _` | '_ \\| | | |/ _ \\ | |" << endl;
+		 		cout << "\t\t | |__| | (_) | (_) | (_| | |_) | |_| |  __/ |_|" << endl;
+		 		cout << "\t\t  \\_____|\\___/ \\___/ \\__,_|_.__/ \\__, |\\___| (_)" << endl;
+		 		cout << "\t\t                                  __/ |         " << endl;
+		 		cout << "\t\t                                 |___/          " << endl;
+		 		
                 return 0; 	
             case 6:
             	cin.clear();
