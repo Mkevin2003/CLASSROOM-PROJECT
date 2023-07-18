@@ -44,7 +44,6 @@ private:
     };
 
     Room* rooms;
-    Room* roomsHead;
     Reservation* reservations;
     string reservationDataFile;
 
@@ -57,7 +56,6 @@ public:
 	    nextReferenceNumber = 1;
 	    rooms = nullptr;
 	    reservations = nullptr;
-	    roomsHead = nullptr; 
 	
 	    createRooms();
 	    reservationDataFile = "reservations.csv";
