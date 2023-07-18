@@ -598,80 +598,131 @@ public:
 	    cout << endl;
 	}
 	
-	void searchRoomAvailability() // -------------------------------------------------------------------------------------------------- SEARCH ROOM AVAILABILITY ---------
-	{
-		system("CLS");
-		searchArt();
-	    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
-	    cout << "|       SEARCH ROOM AVAILABILITY      |" << endl;
-	    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
-	    int day, month, year;
-	    
-	    string dateString = getValidDateString(day, month, year);
-	
-	    Reservation reservation;
-	    reservation.day = day;
-	    reservation.month = month;
-	    reservation.year = year;
-	    
-	    int startHour, startMinute;
-	    
-	    getTimeInput("Enter the start time (HH MM): ", startHour, startMinute);
-	    reservation.startTime = getTimestamp(day, month, year, startHour, startMinute);
-	
-	    int endHour, endMinute;
-	    bool validEndTime = false;
-	    
-	    while (!validEndTime) {
-	        getTimeInput("Enter the end time (HH MM): ", endHour, endMinute);
-	        reservation.endTime = getTimestamp(day, month, year, endHour, endMinute);
-	
-	        if (endHour < startHour || (endHour == startHour && endMinute <= startMinute)) {
-	            validEndTime = false;
-	            cout << "Invalid end time. The end time must be later than the start time." << endl;
-	            cout << "Please enter a valid end time: ";
-	        } else {
-	            validEndTime = true;
-	        }
-	    }
-	    
-		system ("CLS");
-		SetConsoleTextAttribute(color, 14);
-		searchArt();
-		cout << "+----------------------------------------------------+" << endl;
-	    cout << "|   SEARCH AVAILABLE ROOMS FROM: " << formatTime(reservation.startTime) << " TO " << formatTime(reservation.endTime)<< endl;
-	    cout << "+----------------------------------------------------+" << endl;
-	    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+" << endl;
-	    cout << "   Room       |     Status        |     Reference #" << endl;
-	    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+" << endl;
-	
-	    for (int roomNumber = 1; roomNumber <= 15; roomNumber++) 
-		{
-	        reservation.roomNumber = roomNumber;
-	        Reservation* temp = reservations;
-	        bool occupied = false;
-	        while (temp != nullptr) {
-	            if (temp->roomNumber == roomNumber && temp->startTime < reservation.endTime && temp->endTime > reservation.startTime) {
-	            	SetConsoleTextAttribute(color, 6);
-	                cout << " Room  " << left << setw(10) << getRoomName(roomNumber) << setw(14) << "   Occupied               " << temp->referenceNumber << endl;
-	                occupied = true;
-	                break;
-	            }
-	            temp = temp->next;
-	        }
-	
-	        if (!occupied) {
-	        	SetConsoleTextAttribute(color, 14);
-	            cout <<" Room  " << left << setw(10) << getRoomName(roomNumber) << setw(14) <<  "   Available             "  << endl;
-	        }
-	    }
-	    SetConsoleTextAttribute(color, 14);
-	    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+" << endl;
-	    SetConsoleTextAttribute(color, 14);
-	    
-	    enterToGoBack();
-	}
+	void searchRoomAvailability()
+{
+    system("CLS");
+    searchArt();
+    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
+    cout << "|       SEARCH ROOM AVAILABILITY      |" << endl;
+    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-+" << endl;
 
+    // Prompt for date and time
+    int day, month, year;
+    string dateString = getValidDateString(day, month, year);
+
+    Reservation reservation;
+    reservation.day = day;
+    reservation.month = month;
+    reservation.year = year;
+
+    int startHour, startMinute;
+    getTimeInput("Enter the start time (HH MM): ", startHour, startMinute);
+    reservation.startTime = getTimestamp(day, month, year, startHour, startMinute);
+
+    int endHour, endMinute;
+    bool validEndTime = false;
+
+    while (!validEndTime) {
+        getTimeInput("Enter the end time (HH MM): ", endHour, endMinute);
+        reservation.endTime = getTimestamp(day, month, year, endHour, endMinute);
+
+        if (endHour < startHour || (endHour == startHour && endMinute <= startMinute)) {
+            validEndTime = false;
+            cout << "Invalid end time. The end time must be later than the start time." << endl;
+            cout << "Please enter a valid end time: ";
+        } else {
+            validEndTime = true;
+        }
+    }
+
+    system("CLS");
+    SetConsoleTextAttribute(color, 14);
+    searchArt();
+    cout << "+----------------------------------------------------+" << endl;
+    cout << "|   SEARCH AVAILABLE ROOMS FROM: " << formatTime(reservation.startTime) << " TO " << formatTime(reservation.endTime) << endl;
+    cout << "+----------------------------------------------------+" << endl;
+    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+" << endl;
+    cout << "   Room       |     Status        |     Reference #" << endl;
+    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+" << endl;
+
+    for (int roomNumber = 1; roomNumber <= 15; roomNumber++) {
+        reservation.roomNumber = roomNumber;
+        Reservation* temp = reservations;
+        bool occupied = false;
+
+        while (temp != nullptr) {
+            if (temp->roomNumber == roomNumber && temp->startTime < reservation.endTime && temp->endTime > reservation.startTime) {
+                SetConsoleTextAttribute(color, 6);
+                cout << " Room  " << left << setw(10) << getRoomName(roomNumber) << setw(14) << "   Occupied               " << temp->referenceNumber << endl;
+	                occupied = true;
+            }
+            temp = temp->next;
+        }
+
+        if (!occupied) {
+            SetConsoleTextAttribute(color, 14);
+            cout <<" Room  " << left << setw(10) << getRoomName(roomNumber) << setw(14) <<  "   Available             "  << endl;
+        }
+    }
+
+    char occupy;
+    cout << "Occupy a room with the same date and Time? (Y/N): ";
+    cin >> occupy;
+
+    if (tolower(occupy) == 'y') {
+    	displayRoomList();
+        string teacherName, section, occupancy;
+		Reservation newReservation;
+		newReservation.day = day;
+        newReservation.month = month;
+        newReservation.year = year;
+        newReservation.startTime = reservation.startTime;
+        newReservation.endTime = reservation.endTime;
+        int roomNumber = getValidRoomNumber();
+		newReservation.roomNumber = roomNumber;
+		bool overlap = checkReservationOverlap(newReservation);
+		    if (overlap) {
+		    	SetConsoleTextAttribute(color, 12);
+		        cout << "The room is already reserved during the specified time. Request rejected." << endl;
+		        cout << endl;
+		        SetConsoleTextAttribute(color, 14);
+		        enterToGoBack();
+		        return;
+		    }
+        cout << "Enter the teacher's name: ";
+        getline(cin, teacherName);
+
+        cout << "Enter the section: ";
+        getline(cin, section);
+
+        // Create a new reservation
+        
+        newReservation.roomNumber = roomNumber;
+        newReservation.roomName = getRoomName(roomNumber);
+        newReservation.capacity = getRoomCapacity(roomNumber);
+        newReservation.capacity = getValidNumberOfStudents(newReservation.capacity);
+        newReservation.section = section;
+        newReservation.profName = teacherName;
+        newReservation.referenceNumber = getNextReferenceNumber();
+
+        // Add the reservation to the linked list
+        addReservationNode(newReservation);
+
+        // Save the reservation to the file
+        saveReservation(newReservation);
+
+        cout << "Room " << getRoomName(roomNumber) << " has been reserved with reference number " << newReservation.referenceNumber << endl;
+    }
+
+    SetConsoleTextAttribute(color, 14);
+    cout << "+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+" << endl;
+    enterToGoBack();
+}
+
+	int getNextReferenceNumber()
+{
+    return nextReferenceNumber++;
+}
 	void displayReservation(const Reservation* temp) //--------------------------------------------------------------------------------- DISPLAYING INFO TEMP ----------------------
 	{
 	    cout << "| ";
@@ -972,7 +1023,7 @@ public:
 		
 	void deleteLastReservation() //------------------------------------------------------------------------------------------------------ DELETE LAST RESERVATION -------------
 		{
-			 deleteArt();
+			deleteArt();
 		    if (reservations == nullptr)
 		    {
 		        cout << "No reservations found." << endl;
