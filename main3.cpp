@@ -459,9 +459,15 @@ public:
 		    cin >> confirmation;
 		    if (confirmation != 'y' && confirmation != 'Y') {
 		    	SetConsoleTextAttribute(color, 12);
-		        cout << "Reservation cancelled." << endl;
+		        cout << "   _____          _   _  _____ ______ _      _      ______ _____  " << endl;
+			    cout << "  / ____|   /\\   | \\ | |/ ____|  ____| |    | |    |  ____|  __ \\ " << endl;
+			    cout << " | |       /  \\  |  \\| | |    | |__  | |    | |    | |__  | |  | |" << endl;
+			    cout << " | |      / /\\ \\ | . ` | |    |  __| | |    | |    |  __| | |  | | " << endl;
+			    cout << " | |____ / ____ \\| |\\  | |____| |____| |____| |____| |____| |__| |" << endl;
+			    cout << "  \\_____/_/    \\_\\_| \\_|\\_____|______|______|______|______|_____/ " << endl << endl;
 		        SetConsoleTextAttribute(color, 14);
 		        enterToGoBack();
+		        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		        return;
 		    }
 		    
@@ -472,7 +478,14 @@ public:
 		
 		    cout << endl;
 			SetConsoleTextAttribute(color, 10);
+			cout << " _____  ______  _____ ______ _______      ________ _____  " << endl;
+		    cout << "|  __ \\|  ____|/ ____|  ____|  __ \\ \\    / /  ____|  __ \\  " << endl;
+		    cout << "| |__) | |__  | (___ | |__  | |__) \\ \\  / /| |__  | |  | |" << endl;
+		    cout << "|  _  /|  __|  \\___ \\|  __| |  _  / \\ \\/ / |  __| | |  | |" << endl;
+		    cout << "| | \\ \\| |____ ____) | |____| | \\ \\  \\  /  | |____| |__| |" << endl;
+		    cout << "|_|  \\_\\______|_____/|______|_|  \\_\\  \\/   |______|_____/  " << endl << endl;
 		    cout << "Room " << getRoomName(roomNumber) << " reserved. Reference number: " << reservation.referenceNumber;
+		    cout << endl;
 			SetConsoleTextAttribute(color, 14);
 		    saveReservation(reservation);
 		    cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -623,6 +636,7 @@ public:
 	    }
 	    
 		system ("CLS");
+		SetConsoleTextAttribute(color, 14);
 		searchArt();
 		cout << "+----------------------------------------------------+" << endl;
 	    cout << "|   SEARCH AVAILABLE ROOMS FROM: " << formatTime(reservation.startTime) << " TO " << formatTime(reservation.endTime)<< endl;
